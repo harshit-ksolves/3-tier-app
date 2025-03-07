@@ -1,0 +1,25 @@
+
+//mysql
+docker run -d --name mysqldb -e MYSQL_ROOT_PASSWORD=Pokemontgc2@ -e MYSQL_DATABASE=new_db --network new-net mysql
+
+
+//backend
+docker run -d --name backend -p 8081:8081 --network new-net backend
+
+
+//frontend
+build
+docker run -d --name frontend -p 3000:3000 --network new-net frontend:latest
+
+
+
+//testing
+docker exec -it frontend curl http://backend:8081
+
+curl -I http://backend:8081
+
+
+--USE test_db;
+--CREATE TABLE IF NOT EXISTS students(name VARCHAR(100), class VARCHAR(100), roll_number VARCHAR(100));
+--INSERT INTO students VALUES ('test','t','t');
+
