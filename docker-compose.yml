@@ -1,0 +1,55 @@
+
+services:
+  mysqldb:
+    image: mysql:latest
+    container_name: 'mysqldb'
+    environment:
+      - MYSQL_ROOT_PASSWORD=${PASSWORD}
+      - MYSQL_DATABASE=${DATABASE}
+      - MYSQL_USER=${USER}
+      - MYSQL_PASSWORD=${PASSWORD}
+    ports:
+      - "3306:3306" 
+    networks:
+      - new-net
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    container_name: backend
+    build: ./backend
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysqldb
+    command: >
+      sh -c "
+        echo ${USER}
+        echo 'Waiting for MySQL to start...' &&
+        sleep 15 &&
+        echo 'Starting backend application...' &&
+        node server.js
+      "
+    networks:
+      - new-net
+    environment:
+      - HOST=${HOST}
+      - USER=${USER}
+      - PASSWORD=${PASSWORD}
+      - DATABASE=${DATABASE}
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - new-net
+
+networks:
+  new-net:
+    driver: bridge
+
+volumes:
+  mysql_data: 
